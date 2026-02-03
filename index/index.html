@@ -13,7 +13,7 @@
     align-items: center;
     height: 100vh;
     margin: 0;
-    transition: background 0.5s; /* Smooth background color change */
+    transition: background 0.5s;
   }
 
   #game-container, #start-screen {
@@ -27,22 +27,9 @@
     transition: background 0.5s;
   }
 
-  h1, h2 {
-    color: #38bdf8;
-    margin-bottom: 10px;
-  }
-
-  #challenge-number {
-    font-size: 14px;
-    margin-bottom: 5px;
-    color: #94a3b8;
-  }
-
-  #challenge {
-    font-size: 18px;
-    margin: 15px 0;
-  }
-
+  h1, h2 { color: #38bdf8; margin-bottom: 10px; }
+  #challenge-number { font-size: 14px; margin-bottom: 5px; color: #94a3b8; }
+  #challenge { font-size: 18px; margin: 15px 0; }
   #options button {
     display: block;
     width: 100%;
@@ -56,20 +43,9 @@
     color: #e5e7eb;
     transition: all 0.2s;
   }
-
-  #options button:hover {
-    background: #334155;
-    transform: scale(1.03);
-  }
-
-  #feedback {
-    margin: 12px 0;
-    font-weight: bold;
-    min-height: 24px;
-    transition: all 0.3s;
-  }
-
-  #next-btn, #start-screen button {
+  #options button:hover { background: #334155; transform: scale(1.03); }
+  #feedback { margin: 12px 0; font-weight: bold; min-height: 24px; transition: all 0.3s; }
+  #next-btn, #start-screen button, #hint-btn {
     margin-top: 15px;
     padding: 12px 18px;
     font-size: 16px;
@@ -80,11 +56,8 @@
     color: #020617;
     transition: all 0.2s;
   }
-
-  #next-btn:hover, #start-screen button:hover {
-    background: #0ea5e9;
-    transform: scale(1.05);
-  }
+  #next-btn:hover, #start-screen button:hover, #hint-btn:hover { background: #0ea5e9; transform: scale(1.05); }
+  #timer { margin-top:10px; font-weight:bold; color:#facc15; }
 </style>
 </head>
 <body>
@@ -100,128 +73,64 @@
   <div id="challenge-number"></div>
   <div id="challenge"></div>
   <div id="options"></div>
+  <button id="hint-btn" onclick="showHint()">Show Hint</button>
   <div id="feedback"></div>
   <button id="next-btn" onclick="nextChallenge()">Next</button>
   <div id="score">Score: 0</div>
+  <div id="timer"></div>
 </div>
 
 <audio id="correct-sound" src="https://freesound.org/data/previews/66/66717_931655-lq.mp3"></audio>
 <audio id="wrong-sound" src="https://freesound.org/data/previews/331/331912_3248244-lq.mp3"></audio>
 
 <script>
-  const challenges = [
-    {
-      question: "Which is the strongest password?",
-      options: ["123456", "password", "J$9vP#2!"],
-      answer: 2,
-      explanation: "Strong passwords use symbols, numbers, and mixed letters.",
-      bg: "#0f172a"
-    },
-    {
-      question: "Which URL looks safe?",
-      options: ["http://bank-login.fake.com", "https://securebank.com", "http://securebank-login.com"],
-      answer: 1,
-      explanation: "Always look for https and the correct domain name.",
-      bg: "#1e293b"
-    },
-    {
-      question: "What is the security mistake?",
-      options: ["Using HTTPS", "Sharing your password", "Updating your phone"],
-      answer: 1,
-      explanation: "Never share your password with anyone.",
-      bg: "#334155"
-    },
-    {
-      question: "Which Wi-Fi is safest?",
-      options: ["Free_Public_WiFi", "CoffeeShop_WiFi", "Your_Home_WiFi_With_Password"],
-      answer: 2,
-      explanation: "Private Wi-Fi with a password is safer than public networks.",
-      bg: "#1e40af"
-    },
-    {
-      question: "Which action helps protect your data?",
-      options: ["Click all links in emails", "Use two-factor authentication", "Share passwords with friends"],
-      answer: 1,
-      explanation: "Two-factor authentication adds extra security.",
-      bg: "#047857"
-    },
-    {
-      question: "What is a safe practice for emails?",
-      options: ["Open attachments from unknown senders", "Check sender address carefully", "Reply with personal info"],
-      answer: 1,
-      explanation: "Always verify sender addresses to avoid phishing attacks.",
-      bg: "#b45309"
-    }
+  let challenges = [
+    {question:"Which is the strongest password?", options:["123456","password","J$9vP#2!"], answer:2, explanation:"Strong passwords use symbols, numbers, and mixed letters.", bg:"#0f172a", hint:"Think of complexity!"},
+    {question:"Which URL looks safe?", options:["http://bank-login.fake.com","https://securebank.com","http://securebank-login.com"], answer:1, explanation:"Look for https and the correct domain.", bg:"#1e293b", hint:"Check for https and correct domain name."},
+    {question:"What is the security mistake?", options:["Using HTTPS","Sharing your password","Updating your phone"], answer:1, explanation:"Never share your password.", bg:"#334155", hint:"Sharing passwords is risky."},
+    {question:"Which Wi-Fi is safest?", options:["Free_Public_WiFi","CoffeeShop_WiFi","Your_Home_WiFi_With_Password"], answer:2, explanation:"Private Wi-Fi with password is safest.", bg:"#1e40af", hint:"Private networks are safer."},
+    {question:"Which action helps protect your data?", options:["Click all links","Use two-factor authentication","Share passwords"], answer:1, explanation:"Two-factor authentication adds extra security.", bg:"#047857", hint:"Extra authentication layer is key."},
+    {question:"What is a safe practice for emails?", options:["Open attachments from unknown senders","Check sender address carefully","Reply with personal info"], answer:1, explanation:"Verify sender addresses to avoid phishing.", bg:"#b45309", hint:"Always verify sender!"},
+    {question:"Choose a secure app practice", options:["Install from unknown sources","Use official stores only","Share APKs with friends"], answer:1, explanation:"Only use official app stores.", bg:"#7c3aed", hint:"Official stores are safer."},
+    {question:"Strong device security includes:", options:["Set screen lock","Leave unlocked","Share PIN"], answer:0, explanation:"Always set a screen lock.", bg:"#d97706", hint:"Screen locks protect access."}
   ];
 
-  let current = 0;
-  let score = 0;
-  let answered = false;
+  // Shuffle challenges
+  challenges = challenges.sort(() => Math.random() - 0.5);
 
-  function startGame() {
-    document.getElementById("start-screen").style.display = "none";
-    document.getElementById("game-container").style.display = "block";
-    loadChallenge();
+  let current=0, score=0, answered=false, timerInterval=0, timeLeft=20;
+
+  function startGame() { document.getElementById("start-screen").style.display="none"; document.getElementById("game-container").style.display="block"; loadChallenge(); }
+  function loadChallenge(){
+    clearInterval(timerInterval);
+    timeLeft=20;
+    const ch=challenges[current];
+    document.getElementById("challenge-number").innerText=`Challenge ${current+1} / ${challenges.length}`;
+    document.getElementById("challenge").innerText=ch.question;
+    document.body.style.background=ch.bg;
+    const optionsDiv=document.getElementById("options"); optionsDiv.innerHTML="";
+    ch.options.forEach((opt,i)=>{const btn=document.createElement("button"); btn.innerText=opt; btn.onclick=()=>checkAnswer(i); optionsDiv.appendChild(btn);});
+    document.getElementById("feedback").innerText=""; answered=false;
+    document.getElementById("timer").innerText=`Time Left: ${timeLeft}s`;
+    timerInterval=setInterval(()=>{timeLeft--; document.getElementById("timer").innerText=`Time Left: ${timeLeft}s`; if(timeLeft<=0){clearInterval(timerInterval); feedbackTimeOut();}},1000);
   }
 
-  function loadChallenge() {
-    const ch = challenges[current];
-    document.getElementById("challenge-number").innerText = `Challenge ${current + 1} / ${challenges.length}`;
-    document.getElementById("challenge").innerText = ch.question;
-    document.body.style.background = ch.bg;
-
-    const optionsDiv = document.getElementById("options");
-    optionsDiv.innerHTML = "";
-
-    ch.options.forEach((opt, i) => {
-      const btn = document.createElement("button");
-      btn.innerText = opt;
-      btn.onclick = () => checkAnswer(i);
-      optionsDiv.appendChild(btn);
-    });
-
-    document.getElementById("feedback").innerText = "";
-    answered = false;
+  function checkAnswer(selected){
+    if(answered) return;
+    const ch=challenges[current], feedback=document.getElementById("feedback");
+    const correctSound=document.getElementById("correct-sound"), wrongSound=document.getElementById("wrong-sound");
+    clearInterval(timerInterval);
+    if(selected===ch.answer){score++; feedback.innerText="✅ Correct! "+ch.explanation; feedback.style.color="#22c55e"; correctSound.currentTime=0; correctSound.play();}
+    else{feedback.innerText="❌ Wrong! "+ch.explanation; feedback.style.color="#ef4444"; wrongSound.currentTime=0; wrongSound.play();}
+    document.getElementById("score").innerText=`Score: ${score}`;
+    answered=true;
   }
 
-  function checkAnswer(selected) {
-    if (answered) return;
+  function nextChallenge(){ current++; if(current<challenges.length) loadChallenge(); else document.getElementById("game-container").innerHTML=`<h1>Game Over 🎉</h1><p>Your Final Score: <b>${score} / ${challenges.length}</b></p><p>Great job learning cyber safety! 🔐</p><button onclick="location.reload()">Restart Game</button>`; }
 
-    const ch = challenges[current];
-    const feedback = document.getElementById("feedback");
-    const correctSound = document.getElementById("correct-sound");
-    const wrongSound = document.getElementById("wrong-sound");
-
-    if (selected === ch.answer) {
-      score++;
-      feedback.innerText = "✅ Correct! " + ch.explanation;
-      feedback.style.color = "#22c55e";
-      correctSound.currentTime = 0;
-      correctSound.play();
-    } else {
-      feedback.innerText = "❌ Wrong! " + ch.explanation;
-      feedback.style.color = "#ef4444";
-      wrongSound.currentTime = 0;
-      wrongSound.play();
-    }
-
-    document.getElementById("score").innerText = `Score: ${score}`;
-    answered = true;
-  }
-
-  function nextChallenge() {
-    current++;
-    if (current < challenges.length) {
-      loadChallenge();
-    } else {
-      document.getElementById("game-container").innerHTML = `
-        <h1>Game Over 🎉</h1>
-        <p>Your Final Score: <b>${score} / ${challenges.length}</b></p>
-        <p>Great job learning cyber safety! 🔐</p>
-        <button onclick="location.reload()">Restart Game</button>
-      `;
-    }
-  }
+  function showHint(){ if(!answered){alert("💡 Hint: "+challenges[current].hint);} }
+  
+  function feedbackTimeOut(){ const ch=challenges[current]; const feedback=document.getElementById("feedback"); feedback.innerText="⏰ Time's up! "+ch.explanation; feedback.style.color="#f87171"; answered=true; }
 </script>
 
 </body>

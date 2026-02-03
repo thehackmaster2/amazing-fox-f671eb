@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <title>Cyber Safe Mini Game</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <style>
   body {
     font-family: Arial, sans-serif;
@@ -20,7 +21,7 @@
     background: #020617;
     padding: 25px;
     border-radius: 10px;
-    width: 90%;
+    width: 95%;
     max-width: 450px;
     text-align: center;
     box-shadow: 0 0 20px rgba(0,0,0,0.5);
@@ -44,7 +45,9 @@
     transition: all 0.2s;
   }
   #options button:hover { background: #334155; transform: scale(1.03); }
-  #feedback { margin: 12px 0; font-weight: bold; min-height: 24px; transition: all 0.3s; }
+
+  #feedback { margin: 12px 0; font-weight: bold; min-height: 28px; transition: all 0.3s; }
+
   #next-btn, #start-screen button, #hint-btn {
     margin-top: 15px;
     padding: 12px 18px;
@@ -57,7 +60,30 @@
     transition: all 0.2s;
   }
   #next-btn:hover, #start-screen button:hover, #hint-btn:hover { background: #0ea5e9; transform: scale(1.05); }
+
   #timer { margin-top:10px; font-weight:bold; color:#facc15; }
+
+  #progress-container {
+    width: 100%;
+    background: #1e293b;
+    border-radius: 6px;
+    overflow: hidden;
+    margin: 10px 0;
+    height: 15px;
+  }
+  #progress-bar {
+    width: 0%;
+    height: 100%;
+    background: #38bdf8;
+    transition: width 0.4s;
+  }
+
+  #hint-text { margin-top:10px; font-style: italic; color:#fbbf24; min-height:20px; }
+
+  @media(max-width:500px){
+    #options button { font-size:14px; padding:10px; }
+    #next-btn,#start-screen button,#hint-btn { font-size:14px; padding:10px; }
+  }
 </style>
 </head>
 <body>
@@ -71,9 +97,11 @@
 <div id="game-container" style="display:none;">
   <h1>Cyber Safe Mini Game</h1>
   <div id="challenge-number"></div>
+  <div id="progress-container"><div id="progress-bar"></div></div>
   <div id="challenge"></div>
   <div id="options"></div>
   <button id="hint-btn" onclick="showHint()">Show Hint</button>
+  <div id="hint-text"></div>
   <div id="feedback"></div>
   <button id="next-btn" onclick="nextChallenge()">Next</button>
   <div id="score">Score: 0</div>
@@ -84,7 +112,7 @@
 <audio id="wrong-sound" src="https://freesound.org/data/previews/331/331912_3248244-lq.mp3"></audio>
 
 <script>
-  let challenges = [
+let challenges = [
     {question:"Which is the strongest password?", options:["123456","password","J$9vP#2!"], answer:2, explanation:"Strong passwords use symbols, numbers, and mixed letters.", bg:"#0f172a", hint:"Think of complexity!"},
     {question:"Which URL looks safe?", options:["http://bank-login.fake.com","https://securebank.com","http://securebank-login.com"], answer:1, explanation:"Look for https and the correct domain.", bg:"#1e293b", hint:"Check for https and correct domain name."},
     {question:"What is the security mistake?", options:["Using HTTPS","Sharing your password","Updating your phone"], answer:1, explanation:"Never share your password.", bg:"#334155", hint:"Sharing passwords is risky."},
@@ -93,44 +121,113 @@
     {question:"What is a safe practice for emails?", options:["Open attachments from unknown senders","Check sender address carefully","Reply with personal info"], answer:1, explanation:"Verify sender addresses to avoid phishing.", bg:"#b45309", hint:"Always verify sender!"},
     {question:"Choose a secure app practice", options:["Install from unknown sources","Use official stores only","Share APKs with friends"], answer:1, explanation:"Only use official app stores.", bg:"#7c3aed", hint:"Official stores are safer."},
     {question:"Strong device security includes:", options:["Set screen lock","Leave unlocked","Share PIN"], answer:0, explanation:"Always set a screen lock.", bg:"#d97706", hint:"Screen locks protect access."}
-  ];
+];
 
-  // Shuffle challenges
-  challenges = challenges.sort(() => Math.random() - 0.5);
+// Shuffle challenges
+challenges = challenges.sort(() => Math.random() - 0.5);
 
-  let current=0, score=0, answered=false, timerInterval=0, timeLeft=20;
+let current=0, score=0, answered=false, timerInterval=0, timeLeft=20;
+let correctCount=0, wrongCount=0, timeoutCount=0;
 
-  function startGame() { document.getElementById("start-screen").style.display="none"; document.getElementById("game-container").style.display="block"; loadChallenge(); }
-  function loadChallenge(){
+function startGame() { 
+    document.getElementById("start-screen").style.display="none"; 
+    document.getElementById("game-container").style.display="block"; 
+    loadChallenge(); 
+}
+
+function loadChallenge(){
     clearInterval(timerInterval);
     timeLeft=20;
     const ch=challenges[current];
     document.getElementById("challenge-number").innerText=`Challenge ${current+1} / ${challenges.length}`;
     document.getElementById("challenge").innerText=ch.question;
     document.body.style.background=ch.bg;
-    const optionsDiv=document.getElementById("options"); optionsDiv.innerHTML="";
-    ch.options.forEach((opt,i)=>{const btn=document.createElement("button"); btn.innerText=opt; btn.onclick=()=>checkAnswer(i); optionsDiv.appendChild(btn);});
-    document.getElementById("feedback").innerText=""; answered=false;
+    
+    const optionsDiv=document.getElementById("options"); 
+    optionsDiv.innerHTML="";
+    ch.options.forEach((opt,i)=>{
+        const btn=document.createElement("button"); 
+        btn.innerText=opt; 
+        btn.onclick=()=>checkAnswer(i); 
+        optionsDiv.appendChild(btn);
+    });
+    
+    document.getElementById("feedback").innerText="";
+    document.getElementById("hint-text").innerText="";
+    answered=false;
+    
     document.getElementById("timer").innerText=`Time Left: ${timeLeft}s`;
-    timerInterval=setInterval(()=>{timeLeft--; document.getElementById("timer").innerText=`Time Left: ${timeLeft}s`; if(timeLeft<=0){clearInterval(timerInterval); feedbackTimeOut();}},1000);
-  }
+    document.getElementById("progress-bar").style.width = `${(current/challenges.length)*100}%`;
+    
+    timerInterval=setInterval(()=>{
+        timeLeft--; 
+        document.getElementById("timer").innerText=`Time Left: ${timeLeft}s`; 
+        if(timeLeft<=0){clearInterval(timerInterval); feedbackTimeOut();}
+    },1000);
+}
 
-  function checkAnswer(selected){
+function checkAnswer(selected){
     if(answered) return;
     const ch=challenges[current], feedback=document.getElementById("feedback");
     const correctSound=document.getElementById("correct-sound"), wrongSound=document.getElementById("wrong-sound");
     clearInterval(timerInterval);
-    if(selected===ch.answer){score++; feedback.innerText="✅ Correct! "+ch.explanation; feedback.style.color="#22c55e"; correctSound.currentTime=0; correctSound.play();}
-    else{feedback.innerText="❌ Wrong! "+ch.explanation; feedback.style.color="#ef4444"; wrongSound.currentTime=0; wrongSound.play();}
+    
+    if(selected===ch.answer){
+        score++; correctCount++;
+        feedback.innerText="✅ Correct! "+ch.explanation; 
+        feedback.style.color="#22c55e"; 
+        correctSound.currentTime=0; correctSound.play();
+        flashBackground("#16a34a");
+    } else{
+        wrongCount++;
+        feedback.innerText="❌ Wrong! "+ch.explanation; 
+        feedback.style.color="#ef4444"; 
+        wrongSound.currentTime=0; wrongSound.play();
+        flashBackground("#dc2626");
+    }
+    
     document.getElementById("score").innerText=`Score: ${score}`;
     answered=true;
-  }
+}
 
-  function nextChallenge(){ current++; if(current<challenges.length) loadChallenge(); else document.getElementById("game-container").innerHTML=`<h1>Game Over 🎉</h1><p>Your Final Score: <b>${score} / ${challenges.length}</b></p><p>Great job learning cyber safety! 🔐</p><button onclick="location.reload()">Restart Game</button>`; }
+function nextChallenge(){ 
+    current++; 
+    if(current<challenges.length) loadChallenge(); 
+    else showFinalScore();
+}
 
-  function showHint(){ if(!answered){alert("💡 Hint: "+challenges[current].hint);} }
-  
-  function feedbackTimeOut(){ const ch=challenges[current]; const feedback=document.getElementById("feedback"); feedback.innerText="⏰ Time's up! "+ch.explanation; feedback.style.color="#f87171"; answered=true; }
+function showHint(){ 
+    if(!answered){ 
+        document.getElementById("hint-text").innerText = "💡 Hint: "+challenges[current].hint;
+    } 
+}
+
+function feedbackTimeOut(){ 
+    const ch=challenges[current]; 
+    const feedback=document.getElementById("feedback"); 
+    feedback.innerText="⏰ Time's up! "+ch.explanation; 
+    feedback.style.color="#f87171"; 
+    timeoutCount++;
+    answered=true; 
+    flashBackground("#f87171");
+}
+
+function flashBackground(color){
+    const body = document.body;
+    const original = body.style.background;
+    body.style.background = color;
+    setTimeout(()=>{ body.style.background = challenges[current].bg; },300);
+}
+
+function showFinalScore(){
+    document.getElementById("game-container").innerHTML=`
+        <h1>Game Over 🎉</h1>
+        <p>Your Final Score: <b>${score} / ${challenges.length}</b></p>
+        <p>✅ Correct: ${correctCount} | ❌ Wrong: ${wrongCount} | ⏰ Timed Out: ${timeoutCount}</p>
+        <p>Great job learning cyber safety! 🔐</p>
+        <button onclick="location.reload()">Restart Game</button>
+    `;
+}
 </script>
 
 </body>

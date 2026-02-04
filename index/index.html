@@ -104,6 +104,15 @@ h1,h2{color:var(--accent);margin:8px 0}
   gap:6px;
 }
 
+.tip{
+  background:#1e293b;
+  padding:6px;
+  margin:4px 0;
+  border-radius:6px;
+  text-align:left;
+  font-size:14px;
+}
+
 @media(max-width:500px){
   #options button{font-size:14px;padding:10px}
 }
@@ -146,42 +155,26 @@ h1,h2{color:var(--accent);margin:8px 0}
 <audio id="wrong-sound" src="https://freesound.org/data/previews/331/331912_3248244-lq.mp3"></audio>
 
 <script>
+// Questions by level with categories
 const allChallenges = {
   Beginner:[
-    {q:"Which is the strongest password?", o:["123456","password","J$9vP#2!"], a:2, e:"Strong passwords use symbols, numbers, and mixed letters.", h:"Mix letters, numbers & symbols."},
-    {q:"Which URL looks safe?", o:["http://bank-login.fake.com","https://securebank.com","http://securebank-login.com"], a:1, e:"Check HTTPS and correct domain.", h:"Look for https and correct spelling."},
-    {q:"Safe Wi-Fi?", o:["Free_Public_WiFi","CoffeeShop_WiFi","Home_WiFi_With_Password"], a:2, e:"Private Wi-Fi is safest.", h:"Private is safer."},
-    {q:"Which action is safest online?", o:["Click random links","Read website info","Share passwords"], a:1, e:"Read and verify before clicking.", h:"Check websites before clicking."},
-    {q:"Use of antivirus is:", o:["Optional","Important","Dangerous"], a:1, e:"Antivirus protects from malware.", h:"Use antivirus software."},
-    {q:"Strong email password?", o:["abc123","QwErTy!23","password"], a:1, e:"Use complex passwords with symbols.", h:"Complex is strong."},
-    {q:"Safe browser habit?", o:["Ignore pop-ups","Click unknown pop-ups","Use pop-up blockers"], a:2, e:"Pop-up blockers improve safety.", h:"Block unwanted pop-ups."},
-    {q:"What to do with unknown USB?", o:["Plug it in","Ignore it","Give to friend"], a:1, e:"Unknown USBs may be malicious.", h:"Don't plug in unknown devices."},
-    {q:"Safe online shopping?", o:["Use HTTP","Use HTTPS","No preference"], a:1, e:"Always use HTTPS for security.", h:"Check HTTPS."},
-    {q:"Sharing personal info?", o:["Safe","Unsafe","Depends"], a:1, e:"Sharing sensitive info is unsafe.", h:"Keep private info private."}
+    {q:"Strongest password?", o:["123456","password","J$9vP#2!"], a:2, e:"Strong passwords use symbols, numbers, mixed letters.", h:"Mix letters, numbers & symbols.", cat:"Password"},
+    {q:"Safe URL?", o:["http://bank-login.fake.com","https://securebank.com","http://securebank-login.com"], a:1, e:"Check HTTPS and domain.", h:"Check HTTPS and spelling.", cat:"Website"},
+    {q:"Safe Wi-Fi?", o:["Free_Public","CoffeeShop","Home_Password"], a:2, e:"Private Wi-Fi is safest.", h:"Private is safer.", cat:"Network"},
+    {q:"Antivirus use?", o:["Optional","Important","Dangerous"], a:1, e:"Antivirus protects from malware.", h:"Install antivirus.", cat:"Device"},
+    {q:"Sharing info?", o:["Safe","Unsafe","Depends"], a:1, e:"Never share sensitive info.", h:"Keep info private.", cat:"Personal Info"}
   ],
   Intermediate:[
-    {q:"Security mistake?", o:["Using HTTPS","Sharing passwords","Updating software"], a:1, e:"Never share your password.", h:"Passwords are private."},
-    {q:"Protect account?", o:["Click links","2FA","Share passwords"], a:1, e:"2FA adds protection.", h:"Use extra verification."},
-    {q:"Safe email habit?", o:["Open unknown attachments","Check sender","Send info"], a:1, e:"Verify sender.", h:"Check who sent it."},
-    {q:"Phishing signs?", o:["Bad grammar","Correct grammar","All correct"], a:0, e:"Phishing emails often have errors.", h:"Look for mistakes."},
-    {q:"Malware spread?", o:["Download unknown","Use official apps","Share safely"], a:1, e:"Only use official sources.", h:"Install safely."},
-    {q:"Safe password storage?", o:["Write on paper","Password manager","Share with friend"], a:1, e:"Password managers are safest.", h:"Use password managers."},
-    {q:"Public Wi-Fi risk?", o:["Safe","Risky","No difference"], a:1, e:"Public Wi-Fi can be risky.", h:"Avoid unprotected Wi-Fi."},
-    {q:"Software updates?", o:["Ignore","Install promptly","Delay"], a:1, e:"Updates fix vulnerabilities.", h:"Keep software updated."},
-    {q:"Device encryption?", o:["Important","Not needed","Optional"], a:0, e:"Encryption protects data.", h:"Encrypt your devices."},
-    {q:"Two-factor code sharing?", o:["Share","Keep secret","Depends"], a:1, e:"Never share 2FA codes.", h:"Keep 2FA codes secret."}
+    {q:"2FA protection?", o:["Click links","2FA","Share passwords"], a:1, e:"2FA adds protection.", h:"Use 2FA.", cat:"Account"},
+    {q:"Public Wi-Fi?", o:["Safe","Risky","No diff"], a:1, e:"Public Wi-Fi is risky.", h:"Avoid unprotected Wi-Fi.", cat:"Network"},
+    {q:"Email attachments?", o:["Open all","Check sender","Send info"], a:1, e:"Verify before opening.", h:"Check sender.", cat:"Email"},
+    {q:"Password storage?", o:["Paper","Manager","Share"], a:1, e:"Use password manager.", h:"Use secure storage.", cat:"Password"}
   ],
   Advanced:[
-    {q:"Safe app install?", o:["Unknown sites","Official stores","Random APKs"], a:1, e:"Use official app stores.", h:"Official sources only."},
-    {q:"Phone security?", o:["Set lock","Leave unlocked","Share PIN"], a:0, e:"Screen lock protects device.", h:"Lock your device."},
-    {q:"Spot phishing URL", o:["https://secure-paypal.com.fake","https://paypal.com","https://paypal.fake.com"], a:1, e:"Check exact domain.", h:"Check domain name."},
-    {q:"Avoid keyloggers?", o:["Download cracks","Use official software","Share downloads"], a:1, e:"Official software avoids malware.", h:"Use official downloads."},
-    {q:"Detect HTTPS warning?", o:["Ignore","Check certificate","Proceed"], a:1, e:"Always check security certificate.", h:"Check site certificate."},
-    {q:"Browser privacy mode?", o:["Private browsing","Normal mode","Doesn't matter"], a:0, e:"Private mode helps privacy.", h:"Use incognito mode."},
-    {q:"Email attachment safety?", o:["Open all","Scan first","Ignore"], a:1, e:"Scan attachments before opening.", h:"Scan files first."},
-    {q:"VPN usage?", o:["Important","Optional","Not needed"], a:0, e:"VPN protects your connection.", h:"Use VPN on public networks."},
-    {q:"Secure cloud storage?", o:["Any storage","Encrypted only","Unsecured"], a:1, e:"Encrypted storage protects data.", h:"Encrypt cloud storage."},
-    {q:"Detect social engineering?", o:["Verify requests","Trust blindly","Ignore always"], a:0, e:"Always verify requests.", h:"Verify before acting."}
+    {q:"Secure cloud?", o:["Any","Encrypted","Unsecured"], a:1, e:"Use encrypted storage.", h:"Encrypt files.", cat:"Data"},
+    {q:"VPN usage?", o:["Important","Optional","Not needed"], a:0, e:"VPN protects connection.", h:"Use VPN on public Wi-Fi.", cat:"Network"},
+    {q:"Spot phishing URL", o:["https://fake-paypal.com","https://paypal.com","https://paypal.fake.com"], a:1, e:"Check exact domain.", h:"Check domain.", cat:"Website"},
+    {q:"Device encryption?", o:["Important","Optional","Not needed"], a:0, e:"Encrypt devices to protect data.", h:"Use encryption.", cat:"Device"}
   ]
 };
 
@@ -190,12 +183,16 @@ let correct=0, wrong=0, timeout=0;
 let paused=false, soundOn=true;
 let level="Beginner";
 
+// Track mistakes by category
+let categoryMistakes={};
+
 function shuffle(a){return a.sort(()=>Math.random()-0.5)}
 
 function startGame(selectedLevel){
   level=selectedLevel;
   challenges=shuffle(allChallenges[level]);
   current=0; score=0; correct=0; wrong=0; timeout=0;
+  categoryMistakes={};
   document.getElementById("start-screen").style.display="none";
   document.getElementById("game-container").style.display="block";
   loadChallenge();
@@ -213,7 +210,7 @@ function loadChallenge(){
   document.getElementById("hint-text").textContent="";
   document.getElementById("score").textContent=`Score: ${score}`;
 
-  // Random background color flash
+  // Random card color
   const colors=["#0f172a","#1e293b","#1e40af","#047857","#7c3aed","#d97706","#b91c1c"];
   document.querySelector(".card").style.background=colors[Math.floor(Math.random()*colors.length)];
 
@@ -236,6 +233,7 @@ function loadChallenge(){
     if(timeLeft<=0){
       clearInterval(timer);
       timeout++;
+      categoryMistakes[c.cat]=(categoryMistakes[c.cat]||0)+1;
       feedbackFlash("⏰ Time's up! "+c.e,"var(--bad)");
       setTimeout(nextChallenge,1200);
     }
@@ -254,12 +252,12 @@ function checkAnswer(i){
   if(i===c.a){
     score++; correct++;
     feedbackFlash("✅ Correct! "+c.e,"var(--good)");
-    playSound("correct-sound");
   }else{
     wrong++;
     feedbackFlash("❌ Wrong! "+c.e,"var(--bad)");
-    playSound("wrong-sound");
+    categoryMistakes[c.cat]=(categoryMistakes[c.cat]||0)+1;
   }
+  playSound(i===c.a?"correct-sound":"wrong-sound");
   document.getElementById("score").textContent=`Score: ${score}`;
   setTimeout(nextChallenge,1200);
 }
@@ -275,7 +273,7 @@ function feedbackFlash(msg,color){
 function nextChallenge(){
   current++;
   if(current<challenges.length) loadChallenge();
-  else endGame();
+  else showReport();
 }
 
 function showHint(){
@@ -299,27 +297,31 @@ function getRank(ratio){
   return "🥉 Cyber Rookie";
 }
 
-function endGame(){
+function showReport(){
   let bestScoreKey="best-"+level;
   let bestScore=localStorage.getItem(bestScoreKey)||0;
-  if(score>bestScore){
-    bestScore=score;
-    localStorage.setItem(bestScoreKey,bestScore);
-  }
+  if(score>bestScore) localStorage.setItem(bestScoreKey,score);
   const ratio = score / challenges.length;
   const rank=getRank(ratio);
 
+  // Build improvement tips
+  let tips="";
+  for(let cat in categoryMistakes){
+    tips+=`<div class="tip">💡 Improve ${cat}: Mistakes: ${categoryMistakes[cat]}</div>`;
+  }
+
   document.getElementById("game-container").innerHTML=`
-    <h1>🎉 Game Over - ${level}</h1>
-    <p>Your Score: <b>${score} / ${challenges.length}</b></p>
+    <h1>🎉 Game Report - ${level}</h1>
+    <p>Score: <b>${score} / ${challenges.length}</b></p>
     <p>✅ Correct: ${correct} | ❌ Wrong: ${wrong} | ⏰ Timeout: ${timeout}</p>
     <div class="badge">${rank}</div>
-    <p class="small">High Score: ${bestScore}</p>
+    <p class="small">High Score: ${localStorage.getItem(bestScoreKey)}</p>
+    ${tips || '<p>No major mistakes! Great job!</p>'}
     <p>Keep practicing to stay safe online! 🔐</p>
     <button class="btn" onclick="location.reload()">Play Again</button>
   `;
-
-  // Update all high scores
+  
+  // Update high scores display
   document.getElementById("best-Beginner").textContent=localStorage.getItem("best-Beginner")||0;
   document.getElementById("best-Intermediate").textContent=localStorage.getItem("best-Intermediate")||0;
   document.getElementById("best-Advanced").textContent=localStorage.getItem("best-Advanced")||0;

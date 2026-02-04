@@ -5,249 +5,325 @@
 <title>Cyber Safe Mini Game</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <style>
-body {
-    font-family: Arial, sans-serif;
-    background: #0f172a;
-    color: #e5e7eb;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-    margin: 0;
-    transition: background 0.5s;
+:root{
+  --bg:#0f172a;
+  --card:#020617;
+  --accent:#38bdf8;
+  --good:#16a34a;
+  --bad:#dc2626;
+  --warn:#facc15;
+}
+*{box-sizing:border-box}
+body{
+  font-family: Arial, sans-serif;
+  background:var(--bg);
+  color:#e5e7eb;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  height:100vh;
+  margin:0;
+  transition:background .5s;
+}
+.card{
+  background:var(--card);
+  padding:24px;
+  border-radius:12px;
+  width:95%;
+  max-width:480px;
+  text-align:center;
+  box-shadow:0 0 20px rgba(0,0,0,.5);
+  transition:transform .3s, background .3s;
+}
+.card:hover{transform:scale(1.02);}
+h1,h2{color:var(--accent);margin:8px 0}
+.small{color:#94a3b8;font-size:14px}
+#challenge{font-size:18px;margin:16px 0}
+
+#options button{
+  width:100%;
+  margin:8px 0;
+  padding:12px;
+  font-size:16px;
+  border:none;
+  border-radius:8px;
+  cursor:pointer;
+  background:#1e293b;
+  color:#e5e7eb;
+  transition:.2s;
+}
+#options button:hover{background:#334155;transform:scale(1.02)}
+
+.btn{
+  margin:6px;
+  padding:10px 16px;
+  font-size:15px;
+  border:none;
+  border-radius:8px;
+  cursor:pointer;
+  background:var(--accent);
+  color:#020617;
+}
+.btn:hover{background:#0ea5e9}
+
+#progress-container{
+  width:100%;
+  background:#1e293b;
+  border-radius:6px;
+  overflow:hidden;
+  height:14px;
+  margin:10px 0;
+}
+#progress-bar{
+  height:100%;
+  width:0%;
+  background:var(--accent);
+  transition:.3s;
 }
 
-#game-container, #start-screen {
-    background: #020617;
-    padding: 25px;
-    border-radius: 10px;
-    width: 95%;
-    max-width: 450px;
-    text-align: center;
-    box-shadow: 0 0 20px rgba(0,0,0,0.5);
-    transition: background 0.5s;
+#feedback{min-height:28px;font-weight:bold;margin-top:8px;transition:all .3s;}
+#hint-text{color:#fbbf24;min-height:20px;font-style:italic;transition:all .3s;}
+#timer{color:var(--warn);font-weight:bold;margin-top:6px}
+
+.badge{
+  display:inline-block;
+  padding:4px 10px;
+  border-radius:999px;
+  background:#1e293b;
+  margin-top:6px;
+  font-size:13px;
+  transition:all .3s;
 }
 
-h1, h2 { color: #38bdf8; margin-bottom: 10px; }
-#challenge-number { font-size: 14px; margin-bottom: 5px; color: #94a3b8; }
-#challenge { font-size: 18px; margin: 15px 0; }
-#options button {
-    display: block;
-    width: 100%;
-    margin: 8px 0;
-    padding: 12px;
-    font-size: 16px;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-    background: #1e293b;
-    color: #e5e7eb;
-    transition: all 0.2s;
+.footer{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  flex-wrap:wrap;
+  margin-top:10px;
+  gap:6px;
 }
-#options button:hover { background: #334155; transform: scale(1.03); }
-
-#feedback { margin: 12px 0; font-weight: bold; min-height: 28px; transition: all 0.3s; }
-
-#next-btn, #start-screen button, #hint-btn {
-    margin-top: 15px;
-    padding: 12px 18px;
-    font-size: 16px;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-    background: #38bdf8;
-    color: #020617;
-    transition: all 0.2s;
-}
-#next-btn:hover, #start-screen button:hover, #hint-btn:hover { background: #0ea5e9; transform: scale(1.05); }
-
-#timer { margin-top:10px; font-weight:bold; color:#facc15; }
-
-#progress-container {
-    width: 100%;
-    background: #1e293b;
-    border-radius: 6px;
-    overflow: hidden;
-    margin: 10px 0;
-    height: 15px;
-}
-#progress-bar {
-    width: 0%;
-    height: 100%;
-    background: #38bdf8;
-    transition: width 0.4s;
-}
-
-#hint-text { margin-top:10px; font-style: italic; color:#fbbf24; min-height:20px; }
 
 @media(max-width:500px){
-    #options button { font-size:14px; padding:10px; }
-    #next-btn,#start-screen button,#hint-btn { font-size:14px; padding:10px; }
+  #options button{font-size:14px;padding:10px}
 }
 </style>
 </head>
 <body>
 
-<div id="start-screen">
-  <h2>Welcome to Cyber Safe Mini Game!</h2>
-  <p>Test your cybersecurity skills in a fun interactive way!</p>
-  <button onclick="startGame()">Start Game</button>
+<div id="start-screen" class="card">
+  <h2>🛡️ Cyber Safe Mini Game</h2>
+  <p>Select your level to start learning cybersecurity!</p>
+  <button class="btn" onclick="startGame('Beginner')">Beginner</button>
+  <button class="btn" onclick="startGame('Intermediate')">Intermediate</button>
+  <button class="btn" onclick="startGame('Advanced')">Advanced</button>
+  <p class="small">High Scores - Beginner: <span id="best-Beginner">0</span>, Intermediate: <span id="best-Intermediate">0</span>, Advanced: <span id="best-Advanced">0</span></p>
 </div>
 
-<div id="game-container" style="display:none;">
+<div id="game-container" class="card" style="display:none;">
   <h1>Cyber Safe Mini Game</h1>
-  <div id="challenge-number"></div>
+  <div class="small" id="challenge-number"></div>
+
   <div id="progress-container"><div id="progress-bar"></div></div>
+
   <div id="challenge"></div>
   <div id="options"></div>
-  <button id="hint-btn" onclick="showHint()">Show Hint</button>
+
+  <button class="btn" onclick="showHint()">💡 Hint</button>
+  <button class="btn" onclick="togglePause()">⏸️ Pause</button>
+  <button class="btn" onclick="toggleSound()">🔊 Sound</button>
+
   <div id="hint-text"></div>
   <div id="feedback"></div>
-  <button id="next-btn" onclick="nextChallenge()">Next</button>
-  <div id="score">Score: 0</div>
-  <div id="timer"></div>
+
+  <div class="footer">
+    <div id="score">Score: 0</div>
+    <div id="timer">Time: 20s</div>
+  </div>
 </div>
 
 <audio id="correct-sound" src="https://freesound.org/data/previews/66/66717_931655-lq.mp3"></audio>
 <audio id="wrong-sound" src="https://freesound.org/data/previews/331/331912_3248244-lq.mp3"></audio>
 
 <script>
-let challenges = [
-    {question:"Which is the strongest password?", options:["123456","password","J$9vP#2!"], answer:2, explanation:"Strong passwords use symbols, numbers, and mixed letters.", bg:"#0f172a", hint:"Use a mix of letters, numbers, and symbols."},
-    {question:"Which URL looks safe?", options:["http://bank-login.fake.com","https://securebank.com","http://securebank-login.com"], answer:1, explanation:"Look for HTTPS and correct domain name.", bg:"#1e293b", hint:"Check for https and correct spelling."},
-    {question:"What is the security mistake?", options:["Using HTTPS","Sharing your password","Updating your phone"], answer:1, explanation:"Never share your password.", bg:"#334155", hint:"Passwords must stay private."},
-    {question:"Which Wi-Fi is safest?", options:["Free_Public_WiFi","CoffeeShop_WiFi","Your_Home_WiFi_With_Password"], answer:2, explanation:"Private Wi-Fi with password is safest.", bg:"#1e40af", hint:"Private networks are safer."},
-    {question:"Which action helps protect your data?", options:["Click all links","Use two-factor authentication","Share passwords"], answer:1, explanation:"Two-factor authentication adds extra security.", bg:"#047857", hint:"Use extra verification."},
-    {question:"What is a safe practice for emails?", options:["Open attachments from unknown senders","Check sender address carefully","Reply with personal info"], answer:1, explanation:"Verify sender addresses to avoid phishing.", bg:"#b45309", hint:"Always verify the sender."},
-    {question:"Choose a secure app practice", options:["Install from unknown sources","Use official stores only","Share APKs with friends"], answer:1, explanation:"Only use official app stores.", bg:"#7c3aed", hint:"Download apps from official sources."},
-    {question:"Strong device security includes:", options:["Set screen lock","Leave unlocked","Share PIN"], answer:0, explanation:"Always set a screen lock.", bg:"#d97706", hint:"Screen locks protect your device."}
-];
+const allChallenges = {
+  Beginner:[
+    {q:"Which is the strongest password?", o:["123456","password","J$9vP#2!"], a:2, e:"Strong passwords use symbols, numbers, and mixed letters.", h:"Mix letters, numbers & symbols."},
+    {q:"Which URL looks safe?", o:["http://bank-login.fake.com","https://securebank.com","http://securebank-login.com"], a:1, e:"Check HTTPS and correct domain.", h:"Look for https and correct spelling."},
+    {q:"Safe Wi-Fi?", o:["Free_Public_WiFi","CoffeeShop_WiFi","Home_WiFi_With_Password"], a:2, e:"Private Wi-Fi is safest.", h:"Private is safer."},
+    {q:"Which action is safest online?", o:["Click random links","Read website info","Share passwords"], a:1, e:"Read and verify before clicking.", h:"Check websites before clicking."},
+    {q:"Use of antivirus is:", o:["Optional","Important","Dangerous"], a:1, e:"Antivirus protects from malware.", h:"Use antivirus software."},
+    {q:"Strong email password?", o:["abc123","QwErTy!23","password"], a:1, e:"Use complex passwords with symbols.", h:"Complex is strong."},
+    {q:"Safe browser habit?", o:["Ignore pop-ups","Click unknown pop-ups","Use pop-up blockers"], a:2, e:"Pop-up blockers improve safety.", h:"Block unwanted pop-ups."},
+    {q:"What to do with unknown USB?", o:["Plug it in","Ignore it","Give to friend"], a:1, e:"Unknown USBs may be malicious.", h:"Don't plug in unknown devices."},
+    {q:"Safe online shopping?", o:["Use HTTP","Use HTTPS","No preference"], a:1, e:"Always use HTTPS for security.", h:"Check HTTPS."},
+    {q:"Sharing personal info?", o:["Safe","Unsafe","Depends"], a:1, e:"Sharing sensitive info is unsafe.", h:"Keep private info private."}
+  ],
+  Intermediate:[
+    {q:"Security mistake?", o:["Using HTTPS","Sharing passwords","Updating software"], a:1, e:"Never share your password.", h:"Passwords are private."},
+    {q:"Protect account?", o:["Click links","2FA","Share passwords"], a:1, e:"2FA adds protection.", h:"Use extra verification."},
+    {q:"Safe email habit?", o:["Open unknown attachments","Check sender","Send info"], a:1, e:"Verify sender.", h:"Check who sent it."},
+    {q:"Phishing signs?", o:["Bad grammar","Correct grammar","All correct"], a:0, e:"Phishing emails often have errors.", h:"Look for mistakes."},
+    {q:"Malware spread?", o:["Download unknown","Use official apps","Share safely"], a:1, e:"Only use official sources.", h:"Install safely."},
+    {q:"Safe password storage?", o:["Write on paper","Password manager","Share with friend"], a:1, e:"Password managers are safest.", h:"Use password managers."},
+    {q:"Public Wi-Fi risk?", o:["Safe","Risky","No difference"], a:1, e:"Public Wi-Fi can be risky.", h:"Avoid unprotected Wi-Fi."},
+    {q:"Software updates?", o:["Ignore","Install promptly","Delay"], a:1, e:"Updates fix vulnerabilities.", h:"Keep software updated."},
+    {q:"Device encryption?", o:["Important","Not needed","Optional"], a:0, e:"Encryption protects data.", h:"Encrypt your devices."},
+    {q:"Two-factor code sharing?", o:["Share","Keep secret","Depends"], a:1, e:"Never share 2FA codes.", h:"Keep 2FA codes secret."}
+  ],
+  Advanced:[
+    {q:"Safe app install?", o:["Unknown sites","Official stores","Random APKs"], a:1, e:"Use official app stores.", h:"Official sources only."},
+    {q:"Phone security?", o:["Set lock","Leave unlocked","Share PIN"], a:0, e:"Screen lock protects device.", h:"Lock your device."},
+    {q:"Spot phishing URL", o:["https://secure-paypal.com.fake","https://paypal.com","https://paypal.fake.com"], a:1, e:"Check exact domain.", h:"Check domain name."},
+    {q:"Avoid keyloggers?", o:["Download cracks","Use official software","Share downloads"], a:1, e:"Official software avoids malware.", h:"Use official downloads."},
+    {q:"Detect HTTPS warning?", o:["Ignore","Check certificate","Proceed"], a:1, e:"Always check security certificate.", h:"Check site certificate."},
+    {q:"Browser privacy mode?", o:["Private browsing","Normal mode","Doesn't matter"], a:0, e:"Private mode helps privacy.", h:"Use incognito mode."},
+    {q:"Email attachment safety?", o:["Open all","Scan first","Ignore"], a:1, e:"Scan attachments before opening.", h:"Scan files first."},
+    {q:"VPN usage?", o:["Important","Optional","Not needed"], a:0, e:"VPN protects your connection.", h:"Use VPN on public networks."},
+    {q:"Secure cloud storage?", o:["Any storage","Encrypted only","Unsecured"], a:1, e:"Encrypted storage protects data.", h:"Encrypt cloud storage."},
+    {q:"Detect social engineering?", o:["Verify requests","Trust blindly","Ignore always"], a:0, e:"Always verify requests.", h:"Verify before acting."}
+  ]
+};
 
-// Function to shuffle challenges
-function shuffleArray(arr){ return arr.sort(() => Math.random()-0.5); }
+let challenges=[], current=0, score=0, timeLeft=20, timer=null;
+let correct=0, wrong=0, timeout=0;
+let paused=false, soundOn=true;
+let level="Beginner";
 
-let current=0, score=0, answered=false, timerInterval=0, timeLeft=20;
-let correctCount=0, wrongCount=0, timeoutCount=0;
+function shuffle(a){return a.sort(()=>Math.random()-0.5)}
 
-function startGame(){
-    document.getElementById("start-screen").style.display="none";
-    document.getElementById("game-container").style.display="block";
-    challenges = shuffleArray(challenges); // reshuffle on start
-    loadChallenge();
+function startGame(selectedLevel){
+  level=selectedLevel;
+  challenges=shuffle(allChallenges[level]);
+  current=0; score=0; correct=0; wrong=0; timeout=0;
+  document.getElementById("start-screen").style.display="none";
+  document.getElementById("game-container").style.display="block";
+  loadChallenge();
 }
 
 function loadChallenge(){
-    clearInterval(timerInterval);
-    timeLeft=20;
-    const ch=challenges[current];
-    document.getElementById("challenge-number").innerText=`Challenge ${current+1} / ${challenges.length}`;
-    document.getElementById("challenge").innerText=ch.question;
-    document.body.style.background=ch.bg;
+  clearInterval(timer);
+  paused=false;
+  timeLeft=20;
+  const c=challenges[current];
 
-    const optionsDiv=document.getElementById("options");
-    optionsDiv.innerHTML="";
-    ch.options.forEach((opt,i)=>{
-        const btn=document.createElement("button");
-        btn.innerText = `${opt}`; 
-        btn.onclick = () => checkAnswer(i);
-        optionsDiv.appendChild(btn);
-    });
+  document.getElementById("challenge-number").textContent=`${level} - Challenge ${current+1} / ${challenges.length}`;
+  document.getElementById("challenge").textContent=c.q;
+  document.getElementById("feedback").textContent="";
+  document.getElementById("hint-text").textContent="";
+  document.getElementById("score").textContent=`Score: ${score}`;
 
-    document.getElementById("feedback").innerText="";
-    document.getElementById("hint-text").innerText="";
-    answered=false;
-    document.getElementById("timer").innerText=`Time Left: ${timeLeft}s`;
-    document.getElementById("progress-bar").style.width = `${(current/challenges.length)*100}%`;
+  // Random background color flash
+  const colors=["#0f172a","#1e293b","#1e40af","#047857","#7c3aed","#d97706","#b91c1c"];
+  document.querySelector(".card").style.background=colors[Math.floor(Math.random()*colors.length)];
 
-    timerInterval = setInterval(()=>{
-        timeLeft--;
-        document.getElementById("timer").innerText=`Time Left: ${timeLeft}s`;
-        if(timeLeft<=0){ clearInterval(timerInterval); feedbackTimeOut(); }
-    },1000);
+  const optDiv=document.getElementById("options");
+  optDiv.innerHTML="";
+  c.o.forEach((text,i)=>{
+    const b=document.createElement("button");
+    b.textContent=text;
+    b.onclick=()=>checkAnswer(i);
+    optDiv.appendChild(b);
+  });
+
+  document.getElementById("progress-bar").style.width = `${(current/challenges.length)*100}%`;
+  document.getElementById("timer").textContent=`Time: ${timeLeft}s`;
+
+  timer=setInterval(()=>{
+    if(paused) return;
+    timeLeft--;
+    document.getElementById("timer").textContent=`Time: ${timeLeft}s`;
+    if(timeLeft<=0){
+      clearInterval(timer);
+      timeout++;
+      feedbackFlash("⏰ Time's up! "+c.e,"var(--bad)");
+      setTimeout(nextChallenge,1200);
+    }
+  },1000);
 }
 
-function checkAnswer(selected){
-    if(answered) return;
-    const ch=challenges[current], feedback=document.getElementById("feedback");
-    const correctSound=document.getElementById("correct-sound"), wrongSound=document.getElementById("wrong-sound");
-    clearInterval(timerInterval);
+function playSound(id){
+  if(!soundOn) return;
+  const s=document.getElementById(id);
+  s.currentTime=0; s.play();
+}
 
-    if(selected===ch.answer){
-        score++; correctCount++;
-        feedback.innerHTML=`✅ Correct! ${ch.explanation}`;
-        correctSound.currentTime=0; correctSound.play();
-        flashBackground("#16a34a");
-    } else {
-        wrongCount++;
-        feedback.innerHTML=`❌ Wrong! ${ch.explanation}`;
-        wrongSound.currentTime=0; wrongSound.play();
-        flashBackground("#dc2626");
-    }
+function checkAnswer(i){
+  clearInterval(timer);
+  const c=challenges[current];
+  if(i===c.a){
+    score++; correct++;
+    feedbackFlash("✅ Correct! "+c.e,"var(--good)");
+    playSound("correct-sound");
+  }else{
+    wrong++;
+    feedbackFlash("❌ Wrong! "+c.e,"var(--bad)");
+    playSound("wrong-sound");
+  }
+  document.getElementById("score").textContent=`Score: ${score}`;
+  setTimeout(nextChallenge,1200);
+}
 
-    document.getElementById("score").innerText=`Score: ${score}`;
-    answered=true;
-    setTimeout(nextChallenge, 1000); // auto-next after 1 second
+function feedbackFlash(msg,color){
+  const fb=document.getElementById("feedback");
+  fb.textContent=msg;
+  fb.style.color=color;
+  fb.style.transform="scale(1.1)";
+  setTimeout(()=>{ fb.style.transform="scale(1)"; fb.style.color="#e5e7eb"; },500);
 }
 
 function nextChallenge(){
-    current++;
-    if(current<challenges.length) loadChallenge();
-    else showFinalScore();
+  current++;
+  if(current<challenges.length) loadChallenge();
+  else endGame();
 }
 
 function showHint(){
-    if(!answered){
-        document.getElementById("hint-text").innerText="💡 Hint: "+challenges[current].hint;
-    }
+  document.getElementById("hint-text").textContent="💡 Hint: "+challenges[current].h;
 }
 
-function feedbackTimeOut(){
-    const ch=challenges[current];
-    const feedback=document.getElementById("feedback");
-    feedback.innerHTML=`⏰ Time's up! ${ch.explanation}`;
-    timeoutCount++;
-    answered=true;
-    flashBackground("#f87171");
-    setTimeout(nextChallenge, 1500); // auto-next on timeout
+function togglePause(){
+  paused=!paused;
+  document.getElementById("feedback").textContent = paused ? "⏸️ Paused" : "";
 }
 
-function flashBackground(color){
-    const body=document.body;
-    const original=body.style.background;
-    body.style.background=color;
-    setTimeout(()=>{ body.style.background = challenges[current]?.bg || "#0f172a"; }, 300);
+function toggleSound(){
+  soundOn=!soundOn;
+  alert("Sound: "+(soundOn?"ON":"OFF"));
 }
 
-function showFinalScore(){
-    document.getElementById("game-container").innerHTML=`
-        <h1>Game Over 🎉</h1>
-        <p>Your Final Score: <b>${score} / ${challenges.length}</b></p>
-        <p>✅ Correct: ${correctCount} | ❌ Wrong: ${wrongCount} | ⏰ Timed Out: ${timeoutCount}</p>
-        <p>Great job learning cyber safety! 🔐</p>
-        <button onclick="restartGame()">Play Again</button>
-    `;
+function getRank(ratio){
+  if(ratio===1) return "🏆 Cyber Hero";
+  if(ratio>=0.8) return "🥇 Cyber Pro";
+  if(ratio>=0.5) return "🥈 Cyber Learner";
+  return "🥉 Cyber Rookie";
 }
 
-function restartGame(){
-    // Reset all counters
-    current=0; score=0; correctCount=0; wrongCount=0; timeoutCount=0;
-    challenges = shuffleArray(challenges); // reshuffle
-    document.getElementById("game-container").innerHTML=`
-        <h1>Cyber Safe Mini Game</h1>
-        <div id="challenge-number"></div>
-        <div id="progress-container"><div id="progress-bar"></div></div>
-        <div id="challenge"></div>
-        <div id="options"></div>
-        <button id="hint-btn" onclick="showHint()">Show Hint</button>
-        <div id="hint-text"></div>
-        <div id="feedback"></div>
-        <button id="next-btn" onclick="nextChallenge()">Next</button>
-        <div id="score">Score: 0</div>
-        <div id="timer"></div>
-    `;
-    loadChallenge();
+function endGame(){
+  let bestScoreKey="best-"+level;
+  let bestScore=localStorage.getItem(bestScoreKey)||0;
+  if(score>bestScore){
+    bestScore=score;
+    localStorage.setItem(bestScoreKey,bestScore);
+  }
+  const ratio = score / challenges.length;
+  const rank=getRank(ratio);
+
+  document.getElementById("game-container").innerHTML=`
+    <h1>🎉 Game Over - ${level}</h1>
+    <p>Your Score: <b>${score} / ${challenges.length}</b></p>
+    <p>✅ Correct: ${correct} | ❌ Wrong: ${wrong} | ⏰ Timeout: ${timeout}</p>
+    <div class="badge">${rank}</div>
+    <p class="small">High Score: ${bestScore}</p>
+    <p>Keep practicing to stay safe online! 🔐</p>
+    <button class="btn" onclick="location.reload()">Play Again</button>
+  `;
+
+  // Update all high scores
+  document.getElementById("best-Beginner").textContent=localStorage.getItem("best-Beginner")||0;
+  document.getElementById("best-Intermediate").textContent=localStorage.getItem("best-Intermediate")||0;
+  document.getElementById("best-Advanced").textContent=localStorage.getItem("best-Advanced")||0;
 }
 </script>
-
 </body>
 </html>
